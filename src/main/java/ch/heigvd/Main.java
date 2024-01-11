@@ -4,7 +4,6 @@ import io.javalin.Javalin;
 import io.javalin.http.*;
 
 public class Main {
-
     public static final int PORT = 8080;
 
     public static void main(String[] args) {
@@ -23,10 +22,8 @@ public class Main {
 
         app.get("/page1/{path-parameter}", ctx -> {// example : /page1/test
             String pathParameter = ctx.pathParam("path-parameter");
-
             ctx.result("You just called `/page1` with path parameter '" + pathParameter + "'!");
         });
-
 
         app.start(PORT);
     }
