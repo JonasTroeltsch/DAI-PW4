@@ -51,4 +51,6 @@ Run the Package as JAR running configuration then :
 java -jar target/DAI-PW4-1.0-SNAPSHOT.jar
 ```
 
-Then head over here : http://localhost:8080/page1/coords?x=1&y=2
+Then head over here : 
+- http://localhost:8080/json
+- http://localhost:8080/json?x=1&y=2
