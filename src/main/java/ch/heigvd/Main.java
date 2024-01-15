@@ -1,5 +1,7 @@
 package ch.heigvd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,21 +18,33 @@ public class Main {
         private final Color color;
         private final String text;
 
-        public Cell(Color color, String text) {
+        @JsonCreator
+        public Cell(@JsonProperty("color") Color color, @JsonProperty("text") String text) {
             this.color = color;
             this.text = text;
         }
 
-        public Cell(Color color) {
+        @JsonCreator
+        public Cell(@JsonProperty("color") Color color) {
             this(color, "");
         }
 
-        public Cell(String text) {
+        @JsonCreator
+        public Cell(@JsonProperty("text") String text) {
             this(Color.WHITE, text);
         }
 
+        @JsonCreator
         public Cell() {
             this(Color.WHITE, "");
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+        public String getText() {
+            return text;
         }
 
         @Override
@@ -64,7 +78,6 @@ public class Main {
         int ySize = 10;
         Cell[][] grid = new Cell[xSize][ySize];
 
-        // TODO this is bugged as Cell does not have any serializer
         for (int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++) {
                 grid[i][j] = new Cell();
@@ -92,21 +105,26 @@ public class Main {
         app.get("/json", ctx -> {
             String x = ctx.queryParam("x");
             String y = ctx.queryParam("y");
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json;
             if (x != null && y != null) {
-                System.out.println("x : " + x + " y : " + y);
-                ctx.json(grid[Integer.parseInt(x)][Integer.parseInt(y)]);
+                json = mapper.writeValueAsString(grid[Integer.parseInt(x)][Integer.parseInt(y)]);
             } else if (x != null) {
-                ctx.json(grid[Integer.parseInt(x)]);
+                json = mapper.writeValueAsString(grid[Integer.parseInt(x)]);
             } else if (y != null) {
                 int yColumn = Integer.parseInt(y);
                 Cell[] column = new Cell[xSize];
                 for (int i = 0; i < xSize; i++) {
                     column[i] = grid[i][yColumn];
                 }
-                ctx.json(column);
+                json = mapper.writeValueAsString(column);
             } else {
                 ctx.json(grid);
+                json = mapper.writeValueAsString(grid);
             }
+
+            ctx.json(json);
         });
 
         app.get("/page1/coords", ctx -> {// example : /page1/coords?x=1&y=2
