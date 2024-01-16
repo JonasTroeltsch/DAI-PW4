@@ -25,7 +25,33 @@ The website can be found here : https://colorgrid.dedyn.io
 
 ### Deployment of the web app
 
-//TODO
+#### First deployment
+
+To deploy the app on the server, you need to clone this repository on the server and fill the .env  and the 
+dns-challenge.env files in the `deployment/traefik` folder with the correct values. follow instructions in the 
+[README.md](deployment/traefik/README.md)
+
+Then you run the traefik container with the following command :
+
+```bash
+docker compose up -d
+```
+In the `deployment/api` folder, you need to fill the .env file with the correct values 
+And then you can run the following commands to deploy the api :
+
+```bash
+docker compose up -d
+```
+#### Update project
+
+Go to the ´deployment/api´ folder and run the following commands after a new version of the project has been pushed to
+the github repository (see: [Build and publish web app with Docker](#build-and-publish-web-app-with-docker)):
+
+```bash
+docker compose down
+docker compose pull
+docker compose up -d
+```
 
 ### Configure DNS zone
 
