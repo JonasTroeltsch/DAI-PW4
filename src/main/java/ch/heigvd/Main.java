@@ -9,13 +9,19 @@ import io.javalin.Javalin;
 
 import java.awt.*;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class Main {
-    public static final int PORT = 7070;
+    private static final int PORT = 7070;
 
     private static class Cell {
         private final Color color;
         private final String text;
+
+        @JsonCreator
+        public Cell(@JsonProperty("color") String color, @JsonProperty("text") String text) {
+            this(hexToColor(color), text);
+        }
 
         @JsonCreator
         public Cell(@JsonProperty("color") Color color, @JsonProperty("text") String text) {
@@ -24,13 +30,8 @@ public class Main {
         }
 
         @JsonCreator
-        public Cell(@JsonProperty("color") Color color) {
+        public Cell(@JsonProperty("color") String color) {
             this(color, "");
-        }
-
-        @JsonCreator
-        public Cell(@JsonProperty("text") String text) {
-            this(Color.WHITE, text);
         }
 
         @JsonCreator
@@ -49,6 +50,40 @@ public class Main {
         @Override
         public String toString() {
             return "Cell{color=" + color + ", text='" + text + "'}";
+        }
+    }
+
+    private static class Grid {
+
+        private Cell[][] grid;
+        
+        public Grid(int xSize, int ySize) {
+            grid = new Cell[xSize][ySize];
+        }
+
+        public Grid() {
+            this(8, 8);
+        }
+
+        public Cell get(int x, int y) {
+            return grid[x][y];
+        }
+
+        public void set(int x, int y, Cell cell) {
+            grid[x][y] = cell;
+        }
+
+        public Cell[] getLine(int x) {
+            return grid[x];
+        }
+
+        public Cell[] getColumn(int y) {
+            Cell[] column = new Cell[grid.length];
+            for (int i = 0; i < grid.length; i++) {
+                column[i] = grid[i][y];
+            }
+
+            return column;
         }
     }
 
@@ -72,28 +107,46 @@ public class Main {
         }
     }
 
+    private static Color hexToColor(String hexColor) {
+        int intValue = Integer.parseInt(hexColor, 16);
+        return new Color(intValue);
+    }
+
     public static void main(String[] args) {
-        int xSize = 10;
-        int ySize = 10;
-        Cell[][] grid = new Cell[xSize][ySize];
-
-        for (int i = 0; i < xSize; i++) {
-            for (int j = 0; j < ySize; j++) {
-                grid[i][j] = new Cell();
-            }
-        }
-
+        LinkedList<Grid> grids = new LinkedList<>();
         Javalin app = Javalin.create();
-        // for example :
-        // curl -X POST -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": {"red": 255, "green": 0, "blue": 0}, "text": "Hello, world!"}}' http://localhost:8080/json
+
+        //TODO check variables to ensure things exist when we consult them and/or they are comprised in correct intervals
+
+        // curl -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' http://localhost:8080/json
+        // Create an empty grid of size x and y
         app.post("/json", ctx -> {
-            String jsonPayload = ctx.body();
-            JsonNode jsonNode = parseJsonToNode(jsonPayload);
+            JsonNode jsonNode = parseJsonToNode(ctx.body());
+            int xParam = jsonNode.path("x").asInt();
+            int yParam = jsonNode.path("y").asInt();
+            grids.add(new Grid(xParam, yParam));
+            ctx.status(201);
+        });
+
+        // curl -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}' http://localhost:8080/json
+        // Modifies the cell x y of the first grid with the given color and the given text
+        app.patch("/json", ctx -> {
+            JsonNode jsonNode = parseJsonToNode(ctx.body());
             int xParam = jsonNode.path("x").asInt();
             int yParam = jsonNode.path("y").asInt();
             Cell cell = parseJsonToCell(jsonNode.path("cell").toString());
-            grid[xParam][yParam] = cell;
-            System.out.println("post JSON : " + cell);
+            grids.getFirst().set(xParam, yParam, cell);
+            System.out.println("PATCH : " + cell);
+            ctx.status(200);
+        });
+
+        // curl -X POST -H "Content-Type: application/json" http://localhost:8080/json
+        // Delete the first grid
+        app.delete("/json", ctx -> {
+            JsonNode jsonNode = parseJsonToNode(ctx.body());
+            grids.removeFirst();
+            System.out.println("DELETE");
+            ctx.status(204);
         });
 
         // for example : http://localhost:8080
@@ -108,19 +161,14 @@ public class Main {
             ObjectMapper mapper = new ObjectMapper();
             String json;
             if (x != null && y != null) {
-                json = mapper.writeValueAsString(grid[Integer.parseInt(x)][Integer.parseInt(y)]);
+                json = mapper.writeValueAsString(grids.getFirst().get(Integer.parseInt(x), Integer.parseInt(y)));
             } else if (x != null) {
-                json = mapper.writeValueAsString(grid[Integer.parseInt(x)]);
+                json = mapper.writeValueAsString(grids.getFirst().getLine(Integer.parseInt(x)));
             } else if (y != null) {
-                int yColumn = Integer.parseInt(y);
-                Cell[] column = new Cell[xSize];
-                for (int i = 0; i < xSize; i++) {
-                    column[i] = grid[i][yColumn];
-                }
-                json = mapper.writeValueAsString(column);
+                json = mapper.writeValueAsString(grids.getFirst().getColumn(Integer.parseInt(y)));
             } else {
-                ctx.json(grid);
-                json = mapper.writeValueAsString(grid);
+                ctx.json(grids);
+                json = mapper.writeValueAsString(grids);
             }
 
             ctx.json(json);

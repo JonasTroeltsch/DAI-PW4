@@ -13,7 +13,7 @@ The website can be found here : https://colorgrid.dedyn.io
 - Jeremiah Steiner - //TODO
 - Jonas Troeltsch - Responsable VM
 - Sarah Jallon - //TODO 
-- Simon Guggisberg - README & Javalin
+- Simon Guggisberg - Javalin
 
 ## Explanations
 
@@ -134,5 +134,5 @@ java -jar target/DAI-PW4-1.0-SNAPSHOT.jar
 ```
 
 Then head over here : 
-- http://localhost:8080/json
-- http://localhost:8080/json?x=1&y=2
+- http://localhost:7070/json
+- http://localhost:7070/json?x=1&y=2
