@@ -111,6 +111,8 @@ docker compose up -d
 
 ### Build and publish api with Docker
 
+At the root of the project, run these commands :
+
 ```bash
 # Build
 docker build . -t ghcr.io/jonastroeltsch/pw4:latest

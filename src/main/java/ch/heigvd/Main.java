@@ -15,16 +15,11 @@ public class Main {
     private static final int PORT = 7070;
 
     private static class Cell {
-        private final Color color;
+        private final String color;
         private final String text;
 
         @JsonCreator
         public Cell(@JsonProperty("color") String color, @JsonProperty("text") String text) {
-            this(hexToColor(color), text);
-        }
-
-        @JsonCreator
-        public Cell(@JsonProperty("color") Color color, @JsonProperty("text") String text) {
             this.color = color;
             this.text = text;
         }
@@ -36,10 +31,10 @@ public class Main {
 
         @JsonCreator
         public Cell() {
-            this(Color.WHITE, "");
+            this("000000", "");
         }
 
-        public Color getColor() {
+        public String getColor() {
             return color;
         }
 
