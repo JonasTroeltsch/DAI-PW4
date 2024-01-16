@@ -12,7 +12,7 @@ The website can be found here : https://colorgrid.dedyn.io
 ### Group Composition
 - Jeremiah Steiner - //TODO
 - Jonas Troeltsch - Responsable VM
-- Sarah Jaton - //TODO 
+- Sarah Jallon - //TODO 
 - Simon Guggisberg - README & Javalin
 
 ## How to
