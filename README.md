@@ -34,7 +34,11 @@ The website can be found here : https://colorgrid.dedyn.io
 ### Build and publish web app with Docker
 
 ```bash
-docker build . //TODO
+# Build
+docker build . -t ghcr.io/jonastroeltsch/pw4:latest
+
+# Publish
+docker push ghcr.io/jonastroeltsch/pw4:latest
 ```
 
 ### Interact with the web app
