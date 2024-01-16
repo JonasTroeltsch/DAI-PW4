@@ -11,7 +11,7 @@ import java.awt.*;
 import java.io.IOException;
 
 public class Main {
-    public static final int PORT = 8080;
+    public static final int PORT = 7070;
 
     private static class Cell {
         private final Color color;
