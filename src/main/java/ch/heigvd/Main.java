@@ -1,10 +1,11 @@
 package ch.heigvd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.javalin.Javalin;
-import io.javalin.http.*;
 
 import java.awt.*;
 import java.io.IOException;
@@ -12,25 +13,37 @@ import java.io.IOException;
 public class Main {
     public static final int PORT = 8080;
 
-    private class Cell {
-        private Color color;
-        private String text;
+    private static class Cell {
+        private final Color color;
+        private final String text;
 
-        public Cell(Color color, String text) {
+        @JsonCreator
+        public Cell(@JsonProperty("color") Color color, @JsonProperty("text") String text) {
             this.color = color;
             this.text = text;
         }
 
-        public Cell(Color color) {
+        @JsonCreator
+        public Cell(@JsonProperty("color") Color color) {
             this(color, "");
         }
 
-        public Cell(String text) {
+        @JsonCreator
+        public Cell(@JsonProperty("text") String text) {
             this(Color.WHITE, text);
         }
 
+        @JsonCreator
         public Cell() {
             this(Color.WHITE, "");
+        }
+
+        public Color getColor() {
+            return color;
+        }
+
+        public String getText() {
+            return text;
         }
 
         @Override
@@ -64,36 +77,53 @@ public class Main {
         int ySize = 10;
         Cell[][] grid = new Cell[xSize][ySize];
 
+        for (int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++) {
+                grid[i][j] = new Cell();
+            }
+        }
+
         Javalin app = Javalin.create();
-        app.post("/", ctx -> {
+        // for example :
+        // curl -X POST -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": {"red": 255, "green": 0, "blue": 0}, "text": "Hello, world!"}}' http://localhost:8080/json
+        app.post("/json", ctx -> {
             String jsonPayload = ctx.body();
             JsonNode jsonNode = parseJsonToNode(jsonPayload);
             int xParam = jsonNode.path("x").asInt();
             int yParam = jsonNode.path("y").asInt();
-            Cell cell = parseJsonToCell(jsonPayload);
+            Cell cell = parseJsonToCell(jsonNode.path("cell").toString());
             grid[xParam][yParam] = cell;
-            System.out.println("Received JSON payload: " + cell);
+            System.out.println("post JSON : " + cell);
         });
 
-        app.get("/", ctx -> {
-            ctx.json(grid);
-        });
-
-
-        app.get("/page1/coords", ctx -> {// example : /page1/coords?x=1&y=2
+        // for example : http://localhost:8080
+        // /json?x=1&y=2
+        // /json?x=1
+        // /json?y=2
+        // /json
+        app.get("/json", ctx -> {
             String x = ctx.queryParam("x");
             String y = ctx.queryParam("y");
 
-            if (x == null || y == null) {
-                throw new BadRequestResponse();
+            ObjectMapper mapper = new ObjectMapper();
+            String json;
+            if (x != null && y != null) {
+                json = mapper.writeValueAsString(grid[Integer.parseInt(x)][Integer.parseInt(y)]);
+            } else if (x != null) {
+                json = mapper.writeValueAsString(grid[Integer.parseInt(x)]);
+            } else if (y != null) {
+                int yColumn = Integer.parseInt(y);
+                Cell[] column = new Cell[xSize];
+                for (int i = 0; i < xSize; i++) {
+                    column[i] = grid[i][yColumn];
+                }
+                json = mapper.writeValueAsString(column);
+            } else {
+                ctx.json(grid);
+                json = mapper.writeValueAsString(grid);
             }
 
-            ctx.result("Affichage coordonnées : (" + x + "; " + y + ")");
-        });
-
-        app.get("/page1/{path-parameter}", ctx -> {// example : /page1/test
-            String pathParameter = ctx.pathParam("path-parameter");
-            ctx.result("You just called `/page1` with path parameter '" + pathParameter + "'!");
+            ctx.json(json);
         });
 
         app.start(PORT);
