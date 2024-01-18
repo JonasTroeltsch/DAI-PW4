@@ -135,6 +135,20 @@ Run the Package as JAR running configuration then :
 java -jar target/DAI-PW4-1.0-SNAPSHOT.jar
 ```
 
-Then head over here : 
+```bash
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+```bash
+curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}' "http://host.docker.internal:7070/json"        
+```
+
+Then head over to : 
 - http://localhost:7070/json
+- http://localhost:7070/json?x=1
+- http://localhost:7070/json?y=2
 - http://localhost:7070/json?x=1&y=2
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" "http://host.docker.internal:7070/json"
+```
