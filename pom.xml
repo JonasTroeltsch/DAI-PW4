@@ -37,6 +37,16 @@
                                     <resource>MANIFEST.MF</resource>
                                 </transformer>
                             </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -44,11 +54,11 @@
         </plugins>
     </build>
 
-     <dependencies>
+    <dependencies>
         <dependency>
             <groupId>io.javalin</groupId>
-            <artifactId>javalin</artifactId>
+            <artifactId>javalin-bundle</artifactId>
             <version>5.6.3</version>
         </dependency>
-     </dependencies>
+    </dependencies>
 </project>
