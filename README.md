@@ -10,10 +10,20 @@ The grid can be modified with a HTTP message.
 The website can be found here : https://colorgrid.dedyn.io
 
 ### Group Composition
+
+//TODO critère 8 à check
+//TODO critère 12 à check
+//TODO critère 14 à check (devrait jouer mais sait-on jamais)
+//TODO critères 19-25 : présentation
+
 - Jeremiah Steiner - //TODO
 - Jonas Troeltsch - Responsable VM
 - Sarah Jallon - //TODO 
 - Simon Guggisberg - Javalin
+
+## API
+
+//TODO document POST/PATCH/GET/DELETE
 
 ## Explanations
 
@@ -123,9 +133,30 @@ docker push ghcr.io/jonastroeltsch/pw4:latest
 
 ### Interact with the web app
 
-//TODO
+//TODO comment on the examples and make sure they work
+//TODO add output examples
+
+```bash
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "https://colorgrid.dedyn.io/json"
+```
+
+```bash
+curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}' "https://colorgrid.dedyn.io/json"        
+```
+
+Then head over to :
+- https://colorgrid.dedyn.io/json
+- https://colorgrid.dedyn.io/json?x=1
+- https://colorgrid.dedyn.io/json?y=2
+- https://colorgrid.dedyn.io/json?x=1&y=2
+
+```bash
+curl -X DELETE -H "Content-Type: application/json" "https://colorgrid.dedyn.io/json"
+```
 
 ----------------------------------
+
+//TODO remove below, that was useful for developing locally
 
 ## Temporary
 
