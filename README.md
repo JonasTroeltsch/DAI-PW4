@@ -11,11 +11,6 @@ The website can be found here : https://colorgrid.dedyn.io (small description of
 
 ### Group Composition
 
-//TODO critère 8 à check
-//TODO critère 12 à check
-//TODO critère 14 à check (devrait jouer mais sait-on jamais)
-//TODO critères 19-25 : présentation
-
 - Jeremiah Steiner - Javalin 
 - Jonas Troeltsch - Responsable VM
 - Sarah Jallon - Protocol def
