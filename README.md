@@ -10,6 +10,7 @@ The grid can be modified with a HTTP message.
 The website can be found here : https://colorgrid.dedyn.io
 
 ### Group Composition
+<<<<<<< HEAD
 
 //TODO critère 8 à check
 //TODO critère 12 à check
@@ -17,13 +18,334 @@ The website can be found here : https://colorgrid.dedyn.io
 //TODO critères 19-25 : présentation
 
 - Jeremiah Steiner - //TODO
+=======
+- Jeremiah Steiner - 
+>>>>>>> f3b3659 (readme proto)
 - Jonas Troeltsch - Responsable VM
-- Sarah Jallon - //TODO 
+- Sarah Jallon - README (protocol def) + discuss endpoints paths + body responses / status
 - Simon Guggisberg - Javalin
 
+<<<<<<< HEAD
 ## API
 
 //TODO document POST/PATCH/GET/DELETE
+=======
+
+# Application
+
+## What is the app for ?
+
+The goal of this is app is to interact with a "pixel grid". Each "pixel" has a color and an associated char.
+A client can send CRUD operations to a server in order to create, read, update, or delete the pixel grid.
+
+## Protocol and API design
+
+This part describes the possible interactions between a client (user) and the application using the HTTP protocol and the json format.
+
+We will architecture the application using one domain with different parameters.
+
+The json domain that contains complete grid of pixels.
+The json?x=a parameter that contains the a row of the grid
+The json?y=b parameter that contains the b column of the grid
+the json?x=a&y=b parameters that contains a cell located at (a;b)
+
+The cell ressource has the following properties
+color - the color of the cell
+text - the text contained in the cell
+
+The grid ressource is a 2 dimensions matrix of cells, making it a simple table.
+
+The grid resource has the following operations:
+
+Create a new grid of x rows and y cols.
+Get the first grid
+Get a line given its index
+Get a row given its index
+Update a cell (x;y) of the first grid with the given color and the given text
+Delete the first grid
+
+
+The grid resource has the following endpoints and for each endpoint the data is transmitted via the content of the request.
+
+POST /grids  - Create a new grid <br>
+GET /grids - Get the first grid <br>
+GET /grids/{id} - Get the grid based on an id <br>
+GET /grids/{id}?x={x} - Get a row by its index <br>
+GET /grids/{id}?y={y} - Get a col by its index <br>
+GET /grids/{id}?x={x}&y={y} - Get a cell by its location <br>
+PATCH /grids/{id}  - Update a cell <br>
+DELETE /grids/{id} - Delete a user <br>
+
+
+## Endpoints
+
+### Create a new grid
+
+- `POST /grids`
+
+Create a new grid.
+
+#### Request
+
+The request body must contain a JSON object with the following properties:
+
+- `x` - The number of rows
+- `y` - The number of columns
+
+#### Response
+
+The response body contains a JSON object with the following properties:
+
+- `x` - The number of rows
+- `y` - The number of columns
+
+#### Status codes
+
+- `201` (Created) - The grid has been successfully created
+- `418` (I'm a teapot) - The request body is invalid (x and y either missing or negative values)
+- `500` (Server error) - Malformed json
+
+### Get every grid
+
+- `GET /grids`
+
+Get all the grids.
+
+#### Request
+
+The request has no parameters
+
+#### Response
+
+The response body contains a JSON array with the following properties:
+
+
+#### Status codes
+
+- `200` (OK) - The grids have been successfully retrieved
+
+### Get one grid
+
+- `GET /grids/{id}`
+
+Get one grid by its ID.
+
+#### Request
+
+The request path must contain the ID of the grid.
+
+#### Response
+
+The response body contains a JSON object containing the  with the given id
+
+#### Status codes
+
+- `200` (OK) - The grid has been successfully retrieved
+- `404` (Not Found) - The grid does not exist
+
+
+### Get one row of a grid
+
+- `GET /grids/{id}?x={x}`
+
+Get one row of a grid by its index.
+
+#### Request
+
+The request path must contain the ID of the grid and the index of the row.
+
+#### Response
+
+The response body contains a JSON object with the following properties:
+
+#### Status codes
+
+- `200` (OK) - The row has been successfully retrieved
+- `404` (Not Found) - The row does not exist
+
+### Get one col of a grid
+
+- `GET /grids/{id}?y={y}`
+
+Get one col of a grid by its index.
+
+#### Request
+
+The request path must contain the ID of the grid and the index of the col.
+
+#### Response
+
+The response body contains a JSON object with the following properties:
+
+#### Status codes
+
+- `200` (OK) - The row has been successfully retrieved
+- `404` (Not Found) - The row does not exist
+
+### Get one cell of a grid
+
+- `GET /grids/{id}?x={x}&y={y}`
+
+Get one cell of a grid by its (x;y) location.
+
+#### Request
+
+The request path must contain the ID of the grid , the index of the row and the index of the col.
+
+#### Response
+
+The response body contains a JSON object with the following properties:
+
+#### Status codes
+
+- `200` (OK) - The row has been successfully retrieved
+- `404` (Not Found) - The row does not exist
+
+### Update a grid
+
+- `PATCH /grids/{id}`
+
+Update a grid by its ID.
+
+#### Request
+
+The request path must contain the ID of the grid.
+
+The request body must contain a JSON object with the following properties:
+
+- `x` - x index of the cell
+- `y` - y index of the cell
+- `color` - color of the cell
+- `text` - text of the cell
+
+#### Response
+
+The response body contains a JSON object with the following properties:
+
+#### Status codes
+
+- `200` (OK) - The grid has been successfully updated
+- `400` (Bad Request) - The request body is invalid
+- `404` (Not Found) - The user does not exist
+
+### Delete a grid
+
+- `DELETE /grids/{id}`
+
+Delete a grid by its ID.
+
+#### Request
+
+The request path must contain the ID of the grid.
+
+#### Response
+
+The response body is empty.
+
+#### Status codes
+
+- `204` (No Content) - The user has been successfully deleted
+- `404` (Not Found) - The user does not exist
+
+
+## Interact with the web app
+
+Here we are using curl to interact with our endpoints.
+
+### Create a new grid
+
+Request
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+### Get the every grid
+Request
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Get a grid by id
+Request
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Get a row by its index
+Request
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Get a col by its index
+Request
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Get a cell by its indexRequest
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Update a cellRequest
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+### Delete a userRequest
+
+```
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+```
+
+Response
+```
+
+```
+
+>>>>>>> f3b3659 (readme proto)
 
 ## Explanations
 
@@ -131,6 +453,7 @@ docker build . -t ghcr.io/jonastroeltsch/pw4:latest
 docker push ghcr.io/jonastroeltsch/pw4:latest
 ```
 
+<<<<<<< HEAD
 ### Interact with the web app
 
 //TODO comment on the examples and make sure they work
@@ -154,6 +477,8 @@ Then head over to :
 curl -X DELETE -H "Content-Type: application/json" "https://colorgrid.dedyn.io/json"
 ```
 
+=======
+>>>>>>> f3b3659 (readme proto)
 ----------------------------------
 
 //TODO remove below, that was useful for developing locally
