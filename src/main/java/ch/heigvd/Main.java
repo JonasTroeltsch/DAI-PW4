@@ -298,6 +298,27 @@ public class Main {
 
         });
 
+        app.get("/", ctx -> {
+            String result = "";
+            result = "The goal of this is app is to interact with a \"pixel grid\". " +
+                    "Each \"pixel\" has a color and an associated char.\n" +
+                    "A client can send CRUD operations to a server in order to " +
+                    "create, read, update, or delete the pixel grid.\n" +
+                    "POST /grids  - Create a new grid \n" +
+                    "GET /grids - Get the first grid \n" +
+                    "GET /grids/{id} - Get the grid based on an id \n" +
+                    "GET /grids/{id}?x={x} - Get a row by its index \n" +
+                    "GET /grids/{id}?y={y} - Get a col by its index \n" +
+                    "GET /grids/{id}?x={x}&y={y} - Get a cell by its location \n" +
+                    "PATCH /grids/{id}  - Update a cell \n" +
+                    "DELETE /grids/{id} - Delete a user \n";
+            ctx.status(404).result(result);
+        });
+
+        app.get("/{path-param}", ctx -> {
+            ctx.status(404).result("404 page does not exist, try '/' or '/grids' for more results");
+        });
+
         app.get("/coffee", ctx -> {
             ctx.status(418).result("418 I'm a teapot...");
         });

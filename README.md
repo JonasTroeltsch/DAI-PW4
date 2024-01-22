@@ -7,7 +7,7 @@ This webapp displays a grid of pixels as JSON where some pixels can be colored w
 (and if time permits, the grid is displayed in a more visually appealing way)
 The grid can be modified with a HTTP message.
 
-The website can be found here : https://colorgrid.dedyn.io
+The website can be found here : https://colorgrid.dedyn.io (small description of the app available on this page)
 
 ### Group Composition
 
@@ -20,8 +20,6 @@ The website can be found here : https://colorgrid.dedyn.io
 - Jonas Troeltsch - Responsable VM
 - Sarah Jallon - Protocol def
 - Simon Guggisberg - Javalin
-
-
 
 # Application
 
@@ -253,7 +251,6 @@ The response body is empty.
 - `404` (Not Found) - There is no grid at all
 - `400` (Something went wrong) - something is wrong with the request
 - `404` (not found) - the index makes no sense
-
 
 ## Interact with the web app
 
