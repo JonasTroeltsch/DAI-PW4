@@ -10,26 +10,18 @@ The grid can be modified with a HTTP message.
 The website can be found here : https://colorgrid.dedyn.io
 
 ### Group Composition
-<<<<<<< HEAD
 
 //TODO critère 8 à check
 //TODO critère 12 à check
 //TODO critère 14 à check (devrait jouer mais sait-on jamais)
 //TODO critères 19-25 : présentation
 
-- Jeremiah Steiner - //TODO
-=======
-- Jeremiah Steiner - 
->>>>>>> f3b3659 (readme proto)
+- Jeremiah Steiner - Javalin 
 - Jonas Troeltsch - Responsable VM
-- Sarah Jallon - README (protocol def) + discuss endpoints paths + body responses / status
+- Sarah Jallon - Protocol def
 - Simon Guggisberg - Javalin
 
-<<<<<<< HEAD
-## API
 
-//TODO document POST/PATCH/GET/DELETE
-=======
 
 # Application
 
@@ -79,7 +71,7 @@ DELETE /grids/{id} - Delete a user <br>
 
 ## Endpoints
 
-### Create a new grid
+### Create a new empty grid
 
 - `POST /grids`
 
@@ -94,16 +86,16 @@ The request body must contain a JSON object with the following properties:
 
 #### Response
 
-The response body contains a JSON object with the following properties:
+The response body contains a text with the following properties:
 
-- `x` - The number of rows
-- `y` - The number of columns
+- `rows` - The number of rows
+- `cols` - The number of columns
 
 #### Status codes
 
 - `201` (Created) - The grid has been successfully created
-- `418` (I'm a teapot) - The request body is invalid (x and y either missing or negative values)
-- `500` (Server error) - Malformed json
+- `400` (Something went wrong) - The request body is invalid (x and y either missing or negative values)
+
 
 ### Get every grid
 
@@ -117,36 +109,40 @@ The request has no parameters
 
 #### Response
 
-The response body contains a JSON array with the following properties:
+The response body contains a JSON array with the grids
 
 
 #### Status codes
 
 - `200` (OK) - The grids have been successfully retrieved
+- `404` (Not found) - no grids
+
 
 ### Get one grid
 
-- `GET /grids/{id}`
+- `GET /grids/{index}`
 
 Get one grid by its ID.
 
 #### Request
 
-The request path must contain the ID of the grid.
+The request path must contain the index of the grid.
 
 #### Response
 
-The response body contains a JSON object containing the  with the given id
+The response body contains a JSON object containing the grid with the given index
 
 #### Status codes
 
 - `200` (OK) - The grid has been successfully retrieved
-- `404` (Not Found) - The grid does not exist
+- `404` (Not Found) - The grid does not exist or does not fit grid dimension or the index given is not a number
+- `400` (Something went wrong) - something is wrong with the request
+
 
 
 ### Get one row of a grid
 
-- `GET /grids/{id}?x={x}`
+- `GET /grids/{index}?x={x}`
 
 Get one row of a grid by its index.
 
@@ -156,16 +152,19 @@ The request path must contain the ID of the grid and the index of the row.
 
 #### Response
 
-The response body contains a JSON object with the following properties:
+The response body contains a JSON object containing the x row of the grid with the given index
+
 
 #### Status codes
 
 - `200` (OK) - The row has been successfully retrieved
-- `404` (Not Found) - The row does not exist
+- `400` (Something went wrong) - something is wrong with the request
+- `409` (Conflict) - The row does not exist
+- `404` (Not Found) - The grid does not exist or does not fit grid dimension or the index given is not a number
 
 ### Get one col of a grid
 
-- `GET /grids/{id}?y={y}`
+- `GET /grids/{index}?y={y}`
 
 Get one col of a grid by its index.
 
@@ -175,16 +174,18 @@ The request path must contain the ID of the grid and the index of the col.
 
 #### Response
 
-The response body contains a JSON object with the following properties:
+The response body contains a JSON object containing the y col of the grid with the given index
 
 #### Status codes
 
-- `200` (OK) - The row has been successfully retrieved
-- `404` (Not Found) - The row does not exist
+- `200` (OK) - The col has been successfully retrieved
+- `400` (Something went wrong) - something is wrong with the request
+- `409` (Conflict) - The col does not exist
+- `404` (Not Found) - The grid does not exist or does not fit grid dimension or the index given is not a number
 
 ### Get one cell of a grid
 
-- `GET /grids/{id}?x={x}&y={y}`
+- `GET /grids/{index}?x={x}&y={y}`
 
 Get one cell of a grid by its (x;y) location.
 
@@ -194,49 +195,53 @@ The request path must contain the ID of the grid , the index of the row and the 
 
 #### Response
 
-The response body contains a JSON object with the following properties:
+The response body contains a JSON object containing the cell (x;y) of the grid with the given index
 
 #### Status codes
 
 - `200` (OK) - The row has been successfully retrieved
-- `404` (Not Found) - The row does not exist
+- `400` (Something went wrong) - something is wrong with the request
+- `409` (Conflict) - The cell does not exist
+- `404` (Not Found) - The grid does not exist or does not fit grid dimension or the index given is not a number
+
 
 ### Update a grid
 
-- `PATCH /grids/{id}`
+- `PATCH /grids/{index}`
 
-Update a grid by its ID.
+Update a grid by its index.
 
 #### Request
 
-The request path must contain the ID of the grid.
+The request path must contain the index of the grid.
 
 The request body must contain a JSON object with the following properties:
 
 - `x` - x index of the cell
 - `y` - y index of the cell
-- `color` - color of the cell
-- `text` - text of the cell
+- cell:
+    - `color` - color of the cell
+    - `text` - text of the cell
 
 #### Response
 
-The response body contains a JSON object with the following properties:
+The response body contains a JSON object with the updated cell
 
 #### Status codes
 
-- `200` (OK) - The grid has been successfully updated
-- `400` (Bad Request) - The request body is invalid
-- `404` (Not Found) - The user does not exist
+- `200` (OK) - The cell has been successfully updated
+- `400` (Sth went wrong) - The request body is invalid
+- `404` (Not Found) - The cell is not in the grid
 
 ### Delete a grid
 
-- `DELETE /grids/{id}`
+- `DELETE /grids/{index}`
 
-Delete a grid by its ID.
+Delete a grid by its index.
 
 #### Request
 
-The request path must contain the ID of the grid.
+The request path must contain the index of the grid.
 
 #### Response
 
@@ -244,8 +249,10 @@ The response body is empty.
 
 #### Status codes
 
-- `204` (No Content) - The user has been successfully deleted
-- `404` (Not Found) - The user does not exist
+- `204` (No Content) - grid successfully deleted
+- `404` (Not Found) - There is no grid at all
+- `400` (Something went wrong) - something is wrong with the request
+- `404` (not found) - the index makes no sense
 
 
 ## Interact with the web app
@@ -257,95 +264,146 @@ Here we are using curl to interact with our endpoints.
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
 ```
 
 Response
 ```
-
+HTTP/1.1 201 Created
+Date: Mon, 22 Jan 2024 19:04:10 GMT
+Content-Type: text/plain
+Content-Length: 13
 ```
 ### Get the every grid
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
 ```
 
 Response
 ```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:24:50 GMT
+Content-Type: application/json
+Content-Length: 361
 
+[[[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}],[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}]],[[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}],[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}]]]
 ```
 
 ### Get a grid by id
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
 ```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:24:24 GMT
+Content-Type: application/json
+Content-Length: 179
 
+[[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}],[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}]]
+```
+ERROR (index does not exist):
+
+Request
+```
+ curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/18"
 ```
 
+Response:
+```
+HTTP/1.1 404 Not Found
+Date: Mon, 22 Jan 2024 19:25:37 GMT
+Content-Type: text/plain
+Content-Length: 41
+
+404 gridIndex doesn't fit grids dimention
+```
 ### Get a row by its index
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?x=1"
 ```
 
 Response
 ```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:27:55 GMT
+Content-Type: application/json
+Content-Length: 88
 
+[{"color":"000000","text":""},{"color":"000000","text":""},{"color":"000000","text":""}]
 ```
 
 ### Get a col by its index
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?y=1"
 ```
 
 Response
 ```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:28:32 GMT
+Content-Type: application/json
+Content-Length: 59
 
+[{"color":"000000","text":""},{"color":"000000","text":""}]
 ```
 
-### Get a cell by its indexRequest
+### Get a cell by its index
+Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+ curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?x=1&y=1"
+ ```
+
+Response
+```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:29:04 GMT
+Content-Type: application/json
+Content-Length: 28
+
+{"color":"000000","text":""}
+```
+
+### Update a cell
+Request
+
+```
+curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello
+, world!"}}' "http://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
 ```
+HTTP/1.1 200 OK
+Date: Mon, 22 Jan 2024 19:15:14 GMT
+Content-Type: text/plain
+Content-Length: 70
+
+{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}
 
 ```
 
-### Update a cellRequest
+### Delete a user
+Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
-```
-
-Response
-```
-
-```
-
-### Delete a userRequest
-
-```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
+curl -X DELETE -H "Content-Type: application/grids" "http://colorgrid.dedyn.io/grids"
 ```
 
 Response
 ```
-
+Nothing
 ```
-
->>>>>>> f3b3659 (readme proto)
 
 ## Explanations
 
@@ -451,60 +509,4 @@ docker build . -t ghcr.io/jonastroeltsch/pw4:latest
 
 # Publish
 docker push ghcr.io/jonastroeltsch/pw4:latest
-```
-
-<<<<<<< HEAD
-### Interact with the web app
-
-//TODO comment on the examples and make sure they work
-//TODO add output examples
-
-```bash
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "https://colorgrid.dedyn.io/json"
-```
-
-```bash
-curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}' "https://colorgrid.dedyn.io/json"        
-```
-
-Then head over to :
-- https://colorgrid.dedyn.io/json
-- https://colorgrid.dedyn.io/json?x=1
-- https://colorgrid.dedyn.io/json?y=2
-- https://colorgrid.dedyn.io/json?x=1&y=2
-
-```bash
-curl -X DELETE -H "Content-Type: application/json" "https://colorgrid.dedyn.io/json"
-```
-
-=======
->>>>>>> f3b3659 (readme proto)
-----------------------------------
-
-//TODO remove below, that was useful for developing locally
-
-## Temporary
-
-Run the Package as JAR running configuration then :
-
-```bash
-java -jar target/DAI-PW4-1.0-SNAPSHOT.jar
-```
-
-```bash
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://host.docker.internal:7070/json"
-```
-
-```bash
-curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello, world!"}}' "http://host.docker.internal:7070/json"        
-```
-
-Then head over to : 
-- http://localhost:7070/json
-- http://localhost:7070/json?x=1
-- http://localhost:7070/json?y=2
-- http://localhost:7070/json?x=1&y=2
-
-```bash
-curl -X DELETE -H "Content-Type: application/json" "http://host.docker.internal:7070/json"
 ```

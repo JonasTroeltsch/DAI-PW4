@@ -159,7 +159,7 @@ public class Main {
 
                 grids.add(new Grid(xParam, yParam));
                 System.out.println("POST");
-                ctx.status(201).result("ok");
+                ctx.status(201).result("rows=" + xParam + " cols=" + yParam);
             }
             catch (Exception e)
             {
@@ -167,7 +167,7 @@ public class Main {
             }
         });
 
-        // Modifies the cell x y of the first grid with the given color and the given text
+        // Modifies the cell x y of the given grid with the given color and the given text
         app.patch("/grids/{gridIndex}", ctx -> {
             // Abort if there is no grid
             if (grids.isEmpty()) {
@@ -191,7 +191,7 @@ public class Main {
                 }
                 Cell cell = parseJsonToCell(jsonNode.path("cell").toString());
                 grid.set(xParam, yParam, cell);
-                ctx.status(200);
+                ctx.status(200).result(ctx.body() + "\n");
             } catch (Exception e)
             {
                 System.out.println("Exception : x or y not integer");
@@ -218,7 +218,7 @@ public class Main {
             {
                 if (i++ == gridIndex)
                 {
-                    grids.remove(grid); // TODO : test !
+                    grids.remove(grid);
                     break;
                 }
             }
@@ -246,21 +246,21 @@ public class Main {
                     int xParam = Integer.parseInt(x);
                     int yParam = Integer.parseInt(y);
                     if (!grid.isWithin(xParam, yParam)) {
-                        ctx.status(404).result("404 x or y not in the grid");
+                        ctx.status(409).result("409 x or y not in the grid");
                         return;
                     }
                     json = mapper.writeValueAsString(grid.getCell(xParam, yParam));
                 } else if (x != null) {
                     int xParam = Integer.parseInt(x);
                     if (!grid.isWithin(xParam, 0)) {
-                        ctx.status(404).result("404 x not in the grid");
+                        ctx.status(409).result("409 x not in the grid");
                         return;
                     }
                     json = mapper.writeValueAsString(grid.getLine(Integer.parseInt(x)));
                 } else if (y != null) {
                     int yParam = Integer.parseInt(y);
                     if (!grid.isWithin(0, yParam)) {
-                        ctx.status(404).result("404 y not in the grid");
+                        ctx.status(409).result("409 y not in the grid");
                         return;
                     }
                     json = mapper.writeValueAsString(grid.getColumn(Integer.parseInt(y)));
