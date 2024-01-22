@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.javalin.Javalin;
+import io.javalin.http.Context;
 
 import java.awt.*;
 import java.io.IOException;
@@ -114,147 +115,191 @@ public class Main {
         }
     }
 
+    private static int getIndex(Context ctx, LinkedList<Grid> grids)
+    {
+        int gridIndex = 0;
+        try {
+            gridIndex = Integer.parseInt(ctx.pathParam("gridIndex"));
+        }
+        catch (Exception e)
+        {
+            System.out.println("Exception : not an indices");
+            ctx.status(404).result("404 this grid index has no sense");
+            return -1;
+        }
+
+        if (gridIndex < 0 || gridIndex >= grids.size())
+        {
+            System.out.println("Exception : indexes not in grids length");
+            ctx.status(404).result("404 gridIndex doesn't fit grids dimention");
+            return -2;
+        }
+
+        return gridIndex;
+    }
+
     public static void main(String[] args) {
         LinkedList<Grid> grids = new LinkedList<>();
         Javalin app = Javalin.create();
 
 
         // Create an empty grid of size x and y
-        app.post("/json", ctx -> {
-            JsonNode jsonNode = parseJsonToNode(ctx.body());
-            int xParam = jsonNode.path("x").asInt();
-            int yParam = jsonNode.path("y").asInt();
+        app.post("/grids", ctx -> {
+            try
+            {
+                JsonNode jsonNode = parseJsonToNode(ctx.body());
+                int xParam = jsonNode.path("x").asInt();
+                int yParam = jsonNode.path("y").asInt();
 
-            // No empty or negative values accepted
-            if (xParam <= 0 || yParam <= 0) {
-                ctx.status(418);
-                return;
+                // No empty or negative values accepted
+                if (xParam <= 0 || yParam <= 0) {
+                    ctx.status(400).result("400 somethings went wrong with the request (x and y must be positives integers)");
+                    return;
+                }
+
+                grids.add(new Grid(xParam, yParam));
+                System.out.println("POST");
+                ctx.status(201).result("ok");
             }
-
-            grids.add(new Grid(xParam, yParam));
-            System.out.println("POST");
-            ctx.status(201).result("ok");
+            catch (Exception e)
+            {
+                ctx.status(400).result("400 somethings went wrong with the request (x and y must be integers)");
+            }
         });
 
         // Modifies the cell x y of the first grid with the given color and the given text
-        app.patch("/json/{gridIndice}", ctx -> {
+        app.patch("/grids/{gridIndex}", ctx -> {
             // Abort if there is no grid
             if (grids.isEmpty()) {
-                ctx.status(404).result("404 grid table is empty");
+                ctx.status(404).result("404 no grids, try a post request to create one");
                 return;
             }
 
-            Integer gridIndice = Integer.parseInt(ctx.pathParam("gridId"));
-            // TODO : vérifier que gridIndice est ok (min 0 max grids.size() - 1)
-            // sinon : 404 gridIndice doesn't fit grids dimention
+            int gridIndex = getIndex(ctx, grids);
+            if (gridIndex < 0) return; // les autres problèmes sont normalement gérés dans getIndex()
 
             JsonNode jsonNode = parseJsonToNode(ctx.body());
-            int xParam = jsonNode.path("x").asInt();
-            int yParam = jsonNode.path("y").asInt();
-            // TODO : vérifier que x et y existe
+            try {
+                int xParam = jsonNode.path("x").asInt();
+                int yParam = jsonNode.path("y").asInt();
 
-            Grid grid = grids.get(gridIndice);
-            // The index must be within the current grid dimensions
-            if (!grid.isWithin(xParam, yParam)) {
-                ctx.status(404).result("404 not in the grid");
+                Grid grid = grids.get(gridIndex);
+                // The index must be within the current grid dimensions
+                if (!grid.isWithin(xParam, yParam)) {
+                    ctx.status(404).result("404 not in the grid");
+                    return;
+                }
+                Cell cell = parseJsonToCell(jsonNode.path("cell").toString());
+                grid.set(xParam, yParam, cell);
+                ctx.status(200);
+            } catch (Exception e)
+            {
+                System.out.println("Exception : x or y not integer");
+                ctx.status(400).result("400 somethings went wrong with the request (x and y must be integers)");
                 return;
             }
 
-            Cell cell = parseJsonToCell(jsonNode.path("cell").toString());
-            grid.set(xParam, yParam, cell);
-            ctx.status(200);
             System.out.println("PATCH");
         });
 
-        // Delete the first grid
-        app.delete("/json/{gridIndice}", ctx -> {
+        // Delete the grid with param index
+        app.delete("/grids/{gridIndex}", ctx -> {
             // Abort if there is no grid to delete
             if (grids.isEmpty()) {
-                ctx.status(418);
+                ctx.status(404).result("404 no grids, try a post request to create one");
                 return;
             }
 
-            Integer gridIndice = Integer.parseInt(ctx.pathParam("gridId"));
-            // TODO : vérifier que gridIndice est ok (min 0 max grids.size() - 1)
-            // sinon : 404 gridIndice doesn't fit grids dimention
+            int gridIndex = getIndex(ctx, grids);
+            if (gridIndex < 0) return; // les autres problèmes sont normalement gérés dans getIndex()
 
-            grids.removeFirst();
             int i = 0;
             for (Grid grid : grids)
             {
-                if (i == gridIndice)
+                if (i++ == gridIndex)
                 {
                     grids.remove(grid); // TODO : test !
                     break;
                 }
             }
             System.out.println("DELETED");
-            ctx.status(204);
+            ctx.status(204).result("grid successfully deleted");
         });
 
-        app.get("/json/{gridIndice}", ctx -> {
+        app.get("/grids/{gridIndex}", ctx -> {
             if (grids.isEmpty()) {
-                ctx.status(404).result("404 this grid doesn't exist");
+                ctx.status(404).result("404 no grids, try a post request to create one");
                 return;
             }
 
             String x = ctx.queryParam("x");
             String y = ctx.queryParam("y");
-            Integer gridIndice = Integer.parseInt(ctx.pathParam("gridId"));
-            // TODO : vérifier que gridIndice est ok (min 0 max grids.size() - 1)
-            // sinon : 404 gridIndice doesn't fit grids dimention
-            Grid grid = grids.get(gridIndice);
+
+            int gridIndex = getIndex(ctx, grids);
+            if (gridIndex < 0) return; // les autres problèmes sont normalement gérés dans getIndex()
+
+            Grid grid = grids.get(gridIndex);
             ObjectMapper mapper = new ObjectMapper();
             String json;
-            if (x != null && y != null) {
-                int xParam = Integer.parseInt(x);
-                int yParam = Integer.parseInt(y);
-                if (!grid.isWithin(xParam, yParam)) {
-                    ctx.status(418);
-                    return;
+            try {
+                if (x != null && y != null) {
+                    int xParam = Integer.parseInt(x);
+                    int yParam = Integer.parseInt(y);
+                    if (!grid.isWithin(xParam, yParam)) {
+                        ctx.status(404).result("404 x or y not in the grid");
+                        return;
+                    }
+                    json = mapper.writeValueAsString(grid.getCell(xParam, yParam));
+                } else if (x != null) {
+                    int xParam = Integer.parseInt(x);
+                    if (!grid.isWithin(xParam, 0)) {
+                        ctx.status(404).result("404 x not in the grid");
+                        return;
+                    }
+                    json = mapper.writeValueAsString(grid.getLine(Integer.parseInt(x)));
+                } else if (y != null) {
+                    int yParam = Integer.parseInt(y);
+                    if (!grid.isWithin(0, yParam)) {
+                        ctx.status(404).result("404 y not in the grid");
+                        return;
+                    }
+                    json = mapper.writeValueAsString(grid.getColumn(Integer.parseInt(y)));
+                } else {
+                    json = mapper.writeValueAsString(grid.getCells());
                 }
-
-                json = mapper.writeValueAsString(grid.getCell(Integer.parseInt(x), Integer.parseInt(y)));
-            } else if (x != null) {
-                int xParam = Integer.parseInt(x);
-                if (!grid.isWithin(xParam, 0)) {
-                    ctx.status(418);
-                    return;
-                }
-
-                json = mapper.writeValueAsString(grid.getLine(Integer.parseInt(x)));
-            } else if (y != null) {
-                int yParam = Integer.parseInt(y);
-                if (!grid.isWithin(0, yParam)) {
-                    ctx.status(418);
-                    return;
-                }
-
-                json = mapper.writeValueAsString(grid.getColumn(Integer.parseInt(y)));
-            } else {
-                json = mapper.writeValueAsString(grid.getCells());
+            }
+            catch (Exception e)
+            {
+                ctx.status(400).result("400 somethings went wrong with the request (x and y must be integers)");
+                return;
             }
 
             ctx.json(json);
             System.out.println("GET");
         });
 
-        app.get("/json", ctx -> {
+        app.get("/grids", ctx -> {
             if (grids.isEmpty()) {
-                ctx.status(204).result("204 no grids, try a post request to create one");
+                ctx.status(404).result("404 no grids, try a post request to create one");
                 return;
             }
 
             ObjectMapper mapper = new ObjectMapper();
-            String json = "";
+            String json = "[";
+            int i = 0;
             for (Grid grid : grids)
             {
-                json = mapper.writeValueAsString(grid.getCells());
-
+                json += mapper.writeValueAsString(grid.getCells());
+                if (++i < grids.size()) json += ",";
             }
+            json += "]";
             ctx.json(json).status(200);
             System.out.println("GET");
 
+        });
+
+        app.get("/coffee", ctx -> {
+            ctx.status(418).result("418 I'm a teapot...");
         });
 
         app.start(PORT);
