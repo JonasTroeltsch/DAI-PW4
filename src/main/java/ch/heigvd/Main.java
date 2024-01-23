@@ -298,6 +298,14 @@ public class Main {
 
         });
 
+        app.get("/coffee", ctx -> {
+            ctx.status(418).result("418 I'm a teapot...");
+        });
+
+        app.get("/{path-param}", ctx -> {
+            ctx.status(404).result("404 page does not exist, try '/' or '/grids' for more results");
+        });
+
         app.get("/", ctx -> {
             String result = "";
             result = "The goal of this is app is to interact with a \"pixel grid\". " +
@@ -313,14 +321,6 @@ public class Main {
                     "PATCH /grids/{id}  - Update a cell \n" +
                     "DELETE /grids/{id} - Delete a user \n";
             ctx.status(404).result(result);
-        });
-
-        app.get("/{path-param}", ctx -> {
-            ctx.status(404).result("404 page does not exist, try '/' or '/grids' for more results");
-        });
-
-        app.get("/coffee", ctx -> {
-            ctx.status(418).result("418 I'm a teapot...");
         });
 
         app.start(PORT);
