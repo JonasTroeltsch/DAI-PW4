@@ -260,7 +260,7 @@ Here we are using curl to interact with our endpoints.
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "https://colorgrid.dedyn.io/grids"
 ```
 
 Response
@@ -274,7 +274,7 @@ Content-Length: 13
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "https://colorgrid.dedyn.io/grids"
 ```
 
 Response
@@ -291,7 +291,7 @@ Content-Length: 361
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids/0"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "https://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
@@ -307,7 +307,7 @@ ERROR (index does not exist):
 
 Request
 ```
- curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/18"
+ curl -i -X GET -H "Content-Type: application/json" "https://colorgrid.dedyn.io/grids/18"
 ```
 
 Response:
@@ -323,7 +323,7 @@ Content-Length: 41
 Request
 
 ```
-curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?x=1"
+curl -i -X GET -H "Content-Type: application/json" "https://colorgrid.dedyn.io/grids/0?x=1"
 ```
 
 Response
@@ -340,7 +340,7 @@ Content-Length: 88
 Request
 
 ```
-curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?y=1"
+curl -i -X GET -H "Content-Type: application/json" "https://colorgrid.dedyn.io/grids/0?y=1"
 ```
 
 Response
@@ -357,7 +357,7 @@ Content-Length: 59
 Request
 
 ```
- curl -i -X GET -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0?x=1&y=1"
+ curl -i -X GET -H "Content-Type: application/json" "https://colorgrid.dedyn.io/grids/0?x=1&y=1"
  ```
 
 Response
@@ -375,7 +375,7 @@ Request
 
 ```
 curl -i -X PATCH -H "Content-Type: application/json" -d '{"x": 1, "y": 2, "cell": {"color": "220022", "text": "Hello
-, world!"}}' "http://colorgrid.dedyn.io/grids/0"
+, world!"}}' "https://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
@@ -393,7 +393,7 @@ Content-Length: 70
 Request
 
 ```
-curl -X DELETE -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0"
+curl -X DELETE -H "Content-Type: application/json" "https://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
