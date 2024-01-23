@@ -23,43 +23,47 @@ The website can be found here : https://colorgrid.dedyn.io (small description of
 The goal of this is app is to interact with a "pixel grid". Each "pixel" has a color and an associated char.
 A client can send CRUD operations to a server in order to create, read, update, or delete the pixel grid.
 
-## Protocol and API design
+## API design
 
 This part describes the possible interactions between a client (user) and the application using the HTTP protocol and the json format.
 
 We will architecture the application using one domain with different parameters.
 
-The json domain that contains complete grid of pixels.
-The json?x=a parameter that contains the a row of the grid
-The json?y=b parameter that contains the b column of the grid
-the json?x=a&y=b parameters that contains a cell located at (a;b)
+- The grids domain that contains a list of grids of pixels.
+- The grids/{index} parameter that contains a specific grid
+- The grids/{index}?x=a parameter that contains the a row of the grid
+- The grids/{index}?y=b parameter that contains the b column of the grid
+- the grids/{index}?x=a&y=b parameters that contains a cell located at (a;b)
 
 The cell ressource has the following properties
-color - the color of the cell
-text - the text contained in the cell
+- color - the color of the cell
+- text - the text contained in the cell
 
+The grids ressource is a an array of grids table.
 The grid ressource is a 2 dimensions matrix of cells, making it a simple table.
 
 The grid resource has the following operations:
 
-Create a new grid of x rows and y cols.
-Get the first grid
-Get a line given its index
-Get a row given its index
-Update a cell (x;y) of the first grid with the given color and the given text
-Delete the first grid
+- Create a new grid of x rows and y cols.
+- Get all grids
+- Get a grid
+- Get a grid row given its index and row
+- Get a grid col given its index and col
+- Get a cell given its grid and row and col
+- Update a cell (x;y) of the a choosen grid with the given color and the given text
+- Delete the a grid by index
 
 
-The grid resource has the following endpoints and for each endpoint the data is transmitted via the content of the request.
+The grid resource has the following endpoints and for each endpoint the data is transmitted via the body of the request.
 
-POST /grids  - Create a new grid <br>
-GET /grids - Get the first grid <br>
-GET /grids/{id} - Get the grid based on an id <br>
-GET /grids/{id}?x={x} - Get a row by its index <br>
-GET /grids/{id}?y={y} - Get a col by its index <br>
-GET /grids/{id}?x={x}&y={y} - Get a cell by its location <br>
-PATCH /grids/{id}  - Update a cell <br>
-DELETE /grids/{id} - Delete a user <br>
+- POST /grids  - Create a new grid 
+- GET /grids - Get the first grid 
+- GET /grids/{id} - Get the grid based on an id 
+- GET /grids/{id}?x={x} - Get a row by its index 
+- GET /grids/{id}?y={y} - Get a col by its index 
+- GET /grids/{id}?x={x}&y={y} - Get a cell by its location 
+- PATCH /grids/{id}  - Update a cell 
+- DELETE /grids/{id} - Delete a user 
 
 
 ## Endpoints
@@ -115,7 +119,7 @@ The response body contains a JSON array with the grids
 
 - `GET /grids/{index}`
 
-Get one grid by its ID.
+Get one grid by its index.
 
 #### Request
 
@@ -256,7 +260,7 @@ Here we are using curl to interact with our endpoints.
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
 ```
 
 Response
@@ -270,7 +274,7 @@ Content-Length: 13
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids"
 ```
 
 Response
@@ -287,7 +291,7 @@ Content-Length: 361
 Request
 
 ```
-curl -i -X POST -H "Content-Type: application/grids" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids/0"
+curl -i -X POST -H "Content-Type: application/json" -d '{"x": 2, "y": 3}' "http://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
@@ -385,11 +389,11 @@ Content-Length: 70
 
 ```
 
-### Delete a user
+### Delete a grid
 Request
 
 ```
-curl -X DELETE -H "Content-Type: application/grids" "http://colorgrid.dedyn.io/grids"
+curl -X DELETE -H "Content-Type: application/json" "http://colorgrid.dedyn.io/grids/0"
 ```
 
 Response
